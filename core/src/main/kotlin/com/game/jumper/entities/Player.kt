@@ -19,7 +19,7 @@ class Player(x: Float, y: Float) {
     private var skin = PlayerSkin.DEFAULT
     private var lives = Constants.MAX_LIVES
 
-    fun update(delta: Float) {
+    fun update(delta: Float, screenHeight: Float) {
         // Apply gravity
         velocityY += Constants.GRAVITY * delta
 
@@ -30,8 +30,17 @@ class Player(x: Float, y: Float) {
         if (bounds.y <= Constants.GROUND_HEIGHT) {
             // Player hit the ground - game over
             bounds.y = Constants.GROUND_HEIGHT
+            isOnGround = true
         } else {
             isOnGround = false
+        }
+
+        // Check ceiling collision - hitting ceiling also causes damage
+        val maxY = screenHeight - bounds.height
+        if (bounds.y >= maxY) {
+            bounds.y = maxY
+            velocityY = 0f // Stop upward movement
+            // Will be handled by GameScreen to take damage
         }
     }
 
@@ -40,6 +49,14 @@ class Player(x: Float, y: Float) {
      */
     fun isOnGround(): Boolean {
         return bounds.y <= Constants.GROUND_HEIGHT
+    }
+
+    /**
+     * Check if player hit the ceiling
+     */
+    fun isAtCeiling(screenHeight: Float): Boolean {
+        val maxY = screenHeight - bounds.height
+        return bounds.y >= maxY
     }
 
     /**

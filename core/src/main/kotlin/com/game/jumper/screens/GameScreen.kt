@@ -36,6 +36,7 @@ class GameScreen(private val game: JumperGame) : Screen {
     private var spawnTimer = 0f
     private var enemySpawnTimer = 0f
     private var shootCooldown = 0f
+    private var ceilingDamageCooldown = 0f
     private var gameOver = false
 
     override fun show() {
@@ -56,6 +57,7 @@ class GameScreen(private val game: JumperGame) : Screen {
         spawnTimer = 0f
         enemySpawnTimer = 0f
         shootCooldown = 0f
+        ceilingDamageCooldown = 0f
         gameOver = false
     }
 
@@ -151,8 +153,43 @@ class GameScreen(private val game: JumperGame) : Screen {
             game.font.draw(game.batch, text, x, y)
         }
 
-        // Lives (top-left)
-        drawTextWithShadow("LIVES: ${player.getLives()}", 10f, JumperGame.GAME_HEIGHT - 20f, 2.5f)
+        game.batch.end()
+
+        // Draw hearts for lives
+        game.shapeRenderer.projectionMatrix = camera.combined
+        game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+
+        val heartSize = 20f
+        val heartSpacing = 25f
+        val heartStartX = 10f
+        val heartStartY = JumperGame.GAME_HEIGHT - 30f
+
+        for (i in 0 until Constants.MAX_LIVES) {
+            val heartX = heartStartX + i * heartSpacing
+            val heartY = heartStartY
+
+            if (i < player.getLives()) {
+                // Full heart (alive)
+                game.shapeRenderer.color = Constants.LIFE_COLOR
+            } else {
+                // Empty heart (lost)
+                game.shapeRenderer.color = com.badlogic.gdx.graphics.Color(0.3f, 0.3f, 0.3f, 0.5f)
+            }
+
+            // Left circle
+            game.shapeRenderer.circle(heartX + heartSize * 0.3f, heartY + heartSize * 0.35f, heartSize * 0.25f, 12)
+            // Right circle
+            game.shapeRenderer.circle(heartX + heartSize * 0.7f, heartY + heartSize * 0.35f, heartSize * 0.25f, 12)
+            // Bottom triangle
+            game.shapeRenderer.triangle(
+                heartX + heartSize * 0.1f, heartY + heartSize * 0.3f,
+                heartX + heartSize * 0.9f, heartY + heartSize * 0.3f,
+                heartX + heartSize * 0.5f, heartY - heartSize * 0.2f
+            )
+        }
+
+        game.shapeRenderer.end()
+        game.batch.begin()
 
         // Score
         drawTextWithShadow("SCORE: ${GameStateManager.getCurrentScore()}", 10f, JumperGame.GAME_HEIGHT - 55f, 2.5f)
@@ -242,7 +279,7 @@ class GameScreen(private val game: JumperGame) : Screen {
                 val gameY = (touchY / screenHeight) * JumperGame.GAME_HEIGHT
 
                 // Check if clicked on a power-up
-                var powerUpClicked = false
+                var itemClicked = false
                 val powerUpIterator = powerUps.iterator()
                 while (powerUpIterator.hasNext()) {
                     val powerUp = powerUpIterator.next()
@@ -251,13 +288,29 @@ class GameScreen(private val game: JumperGame) : Screen {
                         gameY >= bounds.y && gameY <= bounds.y + bounds.height) {
                         applyPowerUp(powerUp.type)
                         powerUpIterator.remove()
-                        powerUpClicked = true
+                        itemClicked = true
                         break
                     }
                 }
 
-                // If no power-up was clicked, handle jump/shoot
-                if (!powerUpClicked) {
+                // Check if clicked on a life pickup
+                if (!itemClicked) {
+                    val lifeIterator = lifePickups.iterator()
+                    while (lifeIterator.hasNext()) {
+                        val lifePickup = lifeIterator.next()
+                        val bounds = lifePickup.getBounds()
+                        if (gameX >= bounds.x && gameX <= bounds.x + bounds.width &&
+                            gameY >= bounds.y && gameY <= bounds.y + bounds.height) {
+                            player.heal()
+                            lifeIterator.remove()
+                            itemClicked = true
+                            break
+                        }
+                    }
+                }
+
+                // If no item was clicked, handle jump/shoot
+                if (!itemClicked) {
                     if (touchX < screenWidth / 2) {
                         // Left side - jump
                         player.jump()
@@ -282,7 +335,7 @@ class GameScreen(private val game: JumperGame) : Screen {
 
     private fun update(delta: Float) {
         // Update player
-        player.update(delta)
+        player.update(delta, JumperGame.GAME_HEIGHT)
 
         // Update particles
         particleSystem.update(delta)
@@ -290,6 +343,27 @@ class GameScreen(private val game: JumperGame) : Screen {
         // Check if player fell to the ground (game over)
         if (player.isOnGround()) {
             gameOver = true
+        }
+
+        // Update ceiling damage cooldown
+        if (ceilingDamageCooldown > 0f) {
+            ceilingDamageCooldown -= delta
+        }
+
+        // Check if player hit the ceiling (take damage with cooldown)
+        if (player.isAtCeiling(JumperGame.GAME_HEIGHT) && ceilingDamageCooldown <= 0f) {
+            val alive = player.takeDamage()
+            if (!alive) {
+                gameOver = true
+            }
+            // Add damage particle effect
+            particleSystem.addExplosion(
+                player.getX() + Constants.PLAYER_WIDTH / 2,
+                player.getY() + Constants.PLAYER_HEIGHT,
+                com.badlogic.gdx.graphics.Color.YELLOW,
+                15
+            )
+            ceilingDamageCooldown = 1f // 1 second cooldown before taking damage again
         }
 
         // Update shoot cooldown
@@ -492,7 +566,7 @@ class GameScreen(private val game: JumperGame) : Screen {
             }
 
             // Remove off-screen enemies
-            if (enemy.isOffScreen()) {
+            if (enemy.isOffScreen(JumperGame.GAME_WIDTH)) {
                 enemyIterator.remove()
             }
         }
@@ -521,7 +595,7 @@ class GameScreen(private val game: JumperGame) : Screen {
             }
 
             // Remove off-screen bullets
-            if (enemyBullet.isOffScreen()) {
+            if (enemyBullet.isOffScreen(JumperGame.GAME_WIDTH)) {
                 enemyBulletIterator.remove()
             }
         }
@@ -567,6 +641,7 @@ class GameScreen(private val game: JumperGame) : Screen {
         val maxY = JumperGame.GAME_HEIGHT - Constants.ENEMY_HEIGHT - 100f
         val randomY = Random.nextFloat() * (maxY - minY) + minY
 
+        // Spawn from right side, moving left
         val enemy = Enemy(JumperGame.GAME_WIDTH, randomY)
         enemies.add(enemy)
     }

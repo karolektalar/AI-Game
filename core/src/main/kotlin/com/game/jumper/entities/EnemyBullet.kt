@@ -5,13 +5,13 @@ import com.badlogic.gdx.math.Rectangle
 import com.game.jumper.utils.Constants
 
 /**
- * Bullet shot by enemies towards the left (at the player)
+ * Bullet shot by enemies towards the left
  */
 class EnemyBullet(x: Float, y: Float) {
     private val bounds = Rectangle(x, y, Constants.ENEMY_BULLET_WIDTH, Constants.ENEMY_BULLET_HEIGHT)
 
     fun update(delta: Float) {
-        // Move left towards player
+        // Move left
         bounds.x -= Constants.ENEMY_BULLET_SPEED * delta
     }
 
@@ -34,7 +34,7 @@ class EnemyBullet(x: Float, y: Float) {
         return bounds.overlaps(player.getBounds())
     }
 
-    fun isOffScreen(): Boolean {
+    fun isOffScreen(screenWidth: Float): Boolean {
         return bounds.x + bounds.width < 0
     }
 

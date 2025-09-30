@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.game.jumper.utils.Constants
 
 /**
- * Enemy entity that moves left and shoots at the player
+ * Enemy entity that moves left and shoots bullets to the left
  */
 class Enemy(x: Float, y: Float) {
     private val bounds = Rectangle(x, y, Constants.ENEMY_WIDTH, Constants.ENEMY_HEIGHT)
@@ -68,7 +68,7 @@ class Enemy(x: Float, y: Float) {
     fun shoot(): EnemyBullet? {
         if (canShoot()) {
             shootTimer = 0f
-            // Shoot from left side of enemy
+            // Shoot from left side of enemy (towards left)
             return EnemyBullet(bounds.x, bounds.y + bounds.height / 2 - Constants.ENEMY_BULLET_HEIGHT / 2)
         }
         return null
@@ -80,7 +80,7 @@ class Enemy(x: Float, y: Float) {
 
     fun isDead(): Boolean = lives <= 0
 
-    fun isOffScreen(): Boolean {
+    fun isOffScreen(screenWidth: Float): Boolean {
         return bounds.x + bounds.width < 0
     }
 
