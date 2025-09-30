@@ -58,27 +58,54 @@ class Obstacle(
     fun hasBeenScored(): Boolean = scored
 
     /**
-     * Render the obstacle based on its shape
+     * Render the obstacle based on its shape with enhanced visuals
      */
     fun render(shapeRenderer: ShapeRenderer) {
-        shapeRenderer.setColor(Constants.OBSTACLE_COLOR)
-
         when (shape) {
             ObstacleShape.RECTANGLE -> {
-                shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height)
+                // Main body
+                shapeRenderer.setColor(Constants.OBSTACLE_COLOR_1)
+                shapeRenderer.rect(bounds.x + 2, bounds.y + 2, bounds.width - 4, bounds.height - 4)
+
+                // Darker shade for depth
+                shapeRenderer.setColor(Constants.OBSTACLE_COLOR_2)
+                shapeRenderer.rect(bounds.x + 2, bounds.y + 2, bounds.width - 4, bounds.height / 2 - 2)
+
+                // Outline
+                shapeRenderer.setColor(Constants.OBSTACLE_OUTLINE)
+                shapeRenderer.rect(bounds.x, bounds.y, bounds.width, 2f)
+                shapeRenderer.rect(bounds.x, bounds.y + bounds.height - 2, bounds.width, 2f)
+                shapeRenderer.rect(bounds.x, bounds.y, 2f, bounds.height)
+                shapeRenderer.rect(bounds.x + bounds.width - 2, bounds.y, 2f, bounds.height)
             }
             ObstacleShape.CIRCLE -> {
+                // Main circle
+                shapeRenderer.setColor(Constants.OBSTACLE_COLOR_1)
                 shapeRenderer.circle(circle.x, circle.y, circle.radius)
+
+                // Inner darker circle for depth
+                shapeRenderer.setColor(Constants.OBSTACLE_COLOR_2)
+                shapeRenderer.circle(circle.x, circle.y - circle.radius * 0.2f, circle.radius * 0.7f)
+
+                // Small highlight
+                shapeRenderer.setColor(1f, 0.5f, 0.5f, 0.6f)
+                shapeRenderer.circle(circle.x - circle.radius * 0.3f, circle.y + circle.radius * 0.3f, circle.radius * 0.2f)
             }
             ObstacleShape.TRIANGLE -> {
-                // Draw triangle using three points
-                val x1 = bounds.x + bounds.width / 2  // Top center
+                val x1 = bounds.x + bounds.width / 2
                 val y1 = bounds.y + bounds.height
-                val x2 = bounds.x                      // Bottom left
+                val x2 = bounds.x
                 val y2 = bounds.y
-                val x3 = bounds.x + bounds.width       // Bottom right
+                val x3 = bounds.x + bounds.width
                 val y3 = bounds.y
+
+                // Main triangle
+                shapeRenderer.setColor(Constants.OBSTACLE_COLOR_1)
                 shapeRenderer.triangle(x1, y1, x2, y2, x3, y3)
+
+                // Darker bottom half
+                shapeRenderer.setColor(Constants.OBSTACLE_COLOR_2)
+                shapeRenderer.triangle(x1, y1 - bounds.height / 2, x2, y2, x3, y3)
             }
         }
     }

@@ -36,12 +36,7 @@ class GameOverScreen(private val game: JumperGame) : Screen {
 
     override fun render(delta: Float) {
         // Clear screen
-        Gdx.gl.glClearColor(
-            Constants.BACKGROUND_COLOR.r,
-            Constants.BACKGROUND_COLOR.g,
-            Constants.BACKGROUND_COLOR.b,
-            1f
-        )
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         camera.update()

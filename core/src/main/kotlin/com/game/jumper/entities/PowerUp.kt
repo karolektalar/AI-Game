@@ -10,10 +10,16 @@ import com.game.jumper.utils.Constants
 class PowerUp(x: Float, y: Float, val type: PowerUpType) {
 
     private val bounds = Rectangle(x, y, Constants.POWERUP_SIZE, Constants.POWERUP_SIZE)
+    private var animationTime = 0f
+    private var pulseScale = 1f
 
     fun update(delta: Float) {
         // Fall down slowly
         bounds.y -= Constants.POWERUP_FALL_SPEED * delta
+
+        // Pulsing animation
+        animationTime += delta * 3f
+        pulseScale = 1f + kotlin.math.sin(animationTime) * 0.15f
     }
 
     /**
@@ -31,7 +37,7 @@ class PowerUp(x: Float, y: Float, val type: PowerUpType) {
     }
 
     /**
-     * Render the power-up as a colored square with border
+     * Render the power-up with pulsing animation
      */
     fun render(shapeRenderer: ShapeRenderer) {
         val color = when (type) {
@@ -40,13 +46,33 @@ class PowerUp(x: Float, y: Float, val type: PowerUpType) {
             PowerUpType.POWER_JUMP ->
                 Constants.POWERUP_JUMP_COLOR
         }
+
+        // Calculate pulsed size
+        val centerX = bounds.x + bounds.width / 2
+        val centerY = bounds.y + bounds.height / 2
+        val pulsedSize = bounds.width * pulseScale
+
+        // Glow effect
+        shapeRenderer.setColor(color.r, color.g, color.b, 0.3f)
+        shapeRenderer.rect(centerX - pulsedSize / 2 - 3, centerY - pulsedSize / 2 - 3, pulsedSize + 6, pulsedSize + 6)
+
+        // Main body
         shapeRenderer.setColor(color)
-        shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height)
+        shapeRenderer.rect(centerX - pulsedSize / 2, centerY - pulsedSize / 2, pulsedSize, pulsedSize)
+
+        // Bright center
+        val innerSize = pulsedSize * 0.5f
+        shapeRenderer.setColor(1f, 1f, 1f, 0.9f)
+        shapeRenderer.rect(centerX - innerSize / 2, centerY - innerSize / 2, innerSize, innerSize)
     }
 
     fun renderBorder(shapeRenderer: ShapeRenderer) {
+        val centerX = bounds.x + bounds.width / 2
+        val centerY = bounds.y + bounds.height / 2
+        val pulsedSize = bounds.width * pulseScale
+
         shapeRenderer.setColor(1f, 1f, 1f, 1f) // White border
-        shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height)
+        shapeRenderer.rect(centerX - pulsedSize / 2, centerY - pulsedSize / 2, pulsedSize, pulsedSize)
     }
 
     fun getBounds(): Rectangle = bounds

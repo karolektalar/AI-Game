@@ -70,11 +70,27 @@ class Bullet(
     }
 
     /**
-     * Render the bullet as a colored rectangle
+     * Render the bullet with glow effect
      */
     fun render(shapeRenderer: ShapeRenderer) {
+        // Glow effect (larger, transparent)
+        val glowColor = when (weaponType) {
+            WeaponType.NORMAL -> Constants.BULLET_GLOW
+            WeaponType.RAPID_FIRE -> Color(1f, 0.5f, 0f, 0.5f)
+            WeaponType.LASER -> Color(0f, 0.8f, 1f, 0.5f)
+            WeaponType.SPREAD -> Color(1f, 0f, 1f, 0.5f)
+        }
+        shapeRenderer.setColor(glowColor)
+        shapeRenderer.rect(bounds.x - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4)
+
+        // Main bullet
         shapeRenderer.setColor(color)
         shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height)
+
+        // Bright highlight
+        val highlightColor = Color(1f, 1f, 1f, 0.8f)
+        shapeRenderer.setColor(highlightColor)
+        shapeRenderer.rect(bounds.x + 1, bounds.y + bounds.height - 2, bounds.width - 2, 1f)
     }
 
     fun getBounds(): Rectangle = bounds

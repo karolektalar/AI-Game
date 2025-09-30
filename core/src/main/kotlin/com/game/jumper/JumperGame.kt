@@ -35,6 +35,9 @@ class JumperGame(private val adManager: AdManager) : Game() {
             data.setScale(2f)
         }
 
+        // Initialize skin manager
+        com.game.jumper.managers.SkinManager.init()
+
         // Start with the main menu
         setScreen(MenuScreen(this))
     }

@@ -30,22 +30,34 @@ object Constants {
     // Ground
     const val GROUND_HEIGHT = 100f
 
-    // Colors
-    val PLAYER_COLOR = Color.GREEN
-    val OBSTACLE_COLOR = Color.RED
-    val GROUND_COLOR = Color.BROWN
-    val BACKGROUND_COLOR = Color(0.5f, 0.7f, 1f, 1f) // Sky blue
+    // Colors - Enhanced palette
+    val PLAYER_COLOR = Color(0.2f, 0.9f, 0.4f, 1f) // Vibrant green
+    val PLAYER_OUTLINE = Color(0.1f, 0.5f, 0.2f, 1f) // Dark green
+
+    val OBSTACLE_COLOR_1 = Color(0.9f, 0.2f, 0.3f, 1f) // Vibrant red
+    val OBSTACLE_COLOR_2 = Color(0.7f, 0.1f, 0.2f, 1f) // Dark red
+    val OBSTACLE_OUTLINE = Color(0.4f, 0.05f, 0.1f, 1f)
+
+    val GROUND_COLOR_1 = Color(0.3f, 0.25f, 0.2f, 1f) // Dark brown
+    val GROUND_COLOR_2 = Color(0.2f, 0.15f, 0.1f, 1f) // Darker brown
+
+    val BACKGROUND_TOP = Color(0.1f, 0.1f, 0.2f, 1f) // Dark blue/purple
+    val BACKGROUND_BOTTOM = Color(0.4f, 0.2f, 0.5f, 1f) // Purple
+
+    val UI_TEXT_COLOR = Color(1f, 1f, 1f, 1f) // White
+    val UI_SHADOW_COLOR = Color(0f, 0f, 0f, 0.5f) // Semi-transparent black
 
     // Player abilities
     const val MAX_JUMPS = 3 // Multi-jump capability
     const val POWER_JUMP_VELOCITY = 650f // Stronger jump
 
     // Shooting
-    const val BULLET_WIDTH = 10f
-    const val BULLET_HEIGHT = 5f
+    const val BULLET_WIDTH = 12f
+    const val BULLET_HEIGHT = 6f
     const val BULLET_SPEED = 400f
     const val SHOOT_COOLDOWN = 0.3f // Seconds between shots
-    val BULLET_COLOR = Color.YELLOW
+    val BULLET_COLOR = Color(1f, 0.9f, 0.2f, 1f) // Bright yellow
+    val BULLET_GLOW = Color(1f, 0.7f, 0f, 0.6f) // Orange glow
 
     // Weapons
     const val RAPID_FIRE_BULLET_WIDTH = 8f

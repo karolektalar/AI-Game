@@ -16,6 +16,7 @@ class Player(x: Float, y: Float) {
     private var jumpCount = 0
     private var currentWeapon = WeaponType.NORMAL
     private var hasPowerJump = false
+    private var skin = PlayerSkin.DEFAULT
 
     fun update(delta: Float) {
         // Apply gravity
@@ -51,6 +52,11 @@ class Player(x: Float, y: Float) {
      * Make the player jump (supports multi-jump)
      */
     fun jump() {
+        // Reset jump count when falling (allows continuous jumping)
+        if (velocityY < 0) {
+            jumpCount = 0
+        }
+
         // Can always jump in the air now (no ground requirement)
         if (jumpCount < Constants.MAX_JUMPS) {
             velocityY = if (hasPowerJump) Constants.POWER_JUMP_VELOCITY else Constants.JUMP_VELOCITY
@@ -66,12 +72,33 @@ class Player(x: Float, y: Float) {
     }
 
     /**
-     * Render the player as a colored rectangle
+     * Render the player with enhanced visuals using current skin
      */
     fun render(shapeRenderer: ShapeRenderer) {
-        shapeRenderer.setColor(Constants.PLAYER_COLOR)
-        shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height)
+        // Main body
+        shapeRenderer.setColor(skin.primaryColor)
+        shapeRenderer.rect(bounds.x + 2, bounds.y + 2, bounds.width - 4, bounds.height - 4)
+
+        // Outline/border effect
+        shapeRenderer.setColor(skin.outlineColor)
+        shapeRenderer.rect(bounds.x, bounds.y, bounds.width, 2f) // Bottom
+        shapeRenderer.rect(bounds.x, bounds.y + bounds.height - 2, bounds.width, 2f) // Top
+        shapeRenderer.rect(bounds.x, bounds.y, 2f, bounds.height) // Left
+        shapeRenderer.rect(bounds.x + bounds.width - 2, bounds.y, 2f, bounds.height) // Right
+
+        // Highlight effect
+        shapeRenderer.setColor(skin.highlightColor)
+        shapeRenderer.rect(bounds.x + 5, bounds.y + bounds.height - 8, bounds.width - 10, 3f)
     }
+
+    /**
+     * Set player skin
+     */
+    fun setSkin(newSkin: PlayerSkin) {
+        skin = newSkin
+    }
+
+    fun getSkin(): PlayerSkin = skin
 
     fun getBounds(): Rectangle = bounds
 

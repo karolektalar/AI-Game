@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.Align
 import com.game.jumper.JumperGame
+import com.game.jumper.effects.ParticleSystem
 import com.game.jumper.entities.*
 import com.game.jumper.managers.GameStateManager
 import com.game.jumper.utils.Constants
@@ -27,6 +28,7 @@ class GameScreen(private val game: JumperGame) : Screen {
     private val obstacles = mutableListOf<Obstacle>()
     private val bullets = mutableListOf<Bullet>()
     private val powerUps = mutableListOf<PowerUp>()
+    private val particleSystem = ParticleSystem()
 
     private var spawnTimer = 0f
     private var shootCooldown = 0f
@@ -38,7 +40,12 @@ class GameScreen(private val game: JumperGame) : Screen {
         obstacles.clear()
         bullets.clear()
         powerUps.clear()
+        particleSystem.clear()
         player.reset()
+
+        // Apply current skin
+        player.setSkin(com.game.jumper.managers.SkinManager.getCurrentSkin())
+
         spawnTimer = 0f
         shootCooldown = 0f
         gameOver = false
@@ -49,19 +56,31 @@ class GameScreen(private val game: JumperGame) : Screen {
             update(delta)
         }
 
-        // Clear screen
-        Gdx.gl.glClearColor(
-            Constants.BACKGROUND_COLOR.r,
-            Constants.BACKGROUND_COLOR.g,
-            Constants.BACKGROUND_COLOR.b,
-            1f
-        )
+        // Clear screen with gradient background
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         camera.update()
 
-        // Render game objects
+        // Render gradient background
         game.shapeRenderer.projectionMatrix = camera.combined
+        game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+
+        // Draw gradient from top to bottom
+        val gradientSteps = 20
+        val stepHeight = JumperGame.GAME_HEIGHT / gradientSteps
+        for (i in 0 until gradientSteps) {
+            val ratio = i.toFloat() / gradientSteps
+            val r = Constants.BACKGROUND_TOP.r + (Constants.BACKGROUND_BOTTOM.r - Constants.BACKGROUND_TOP.r) * ratio
+            val g = Constants.BACKGROUND_TOP.g + (Constants.BACKGROUND_BOTTOM.g - Constants.BACKGROUND_TOP.g) * ratio
+            val b = Constants.BACKGROUND_TOP.b + (Constants.BACKGROUND_BOTTOM.b - Constants.BACKGROUND_TOP.b) * ratio
+            game.shapeRenderer.setColor(r, g, b, 1f)
+            game.shapeRenderer.rect(0f, JumperGame.GAME_HEIGHT - (i + 1) * stepHeight, JumperGame.GAME_WIDTH, stepHeight)
+        }
+
+        game.shapeRenderer.end()
+
+        // Render game objects
         game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
 
         ground.render(game.shapeRenderer)
@@ -79,6 +98,9 @@ class GameScreen(private val game: JumperGame) : Screen {
             powerUp.render(game.shapeRenderer)
         }
 
+        // Render particles
+        particleSystem.render(game.shapeRenderer)
+
         game.shapeRenderer.end()
 
         // Render power-up borders
@@ -92,47 +114,60 @@ class GameScreen(private val game: JumperGame) : Screen {
         game.batch.projectionMatrix = camera.combined
         game.batch.begin()
 
-        // Score and weapon info
-        val scoreText = "SCORE: ${GameStateManager.getCurrentScore()}"
-        game.font.draw(
-            game.batch,
-            scoreText,
-            10f,
-            JumperGame.GAME_HEIGHT - 20f
-        )
-
-        // Current weapon
-        val weaponText = "WEAPON: ${player.getCurrentWeapon().name}"
-        game.font.draw(
-            game.batch,
-            weaponText,
-            10f,
-            JumperGame.GAME_HEIGHT - 50f
-        )
-
-        // Power jump indicator
-        if (player.hasPowerJump()) {
-            val powerJumpText = "POWER JUMP!"
-            game.font.draw(
-                game.batch,
-                powerJumpText,
-                10f,
-                JumperGame.GAME_HEIGHT - 80f
-            )
+        // Helper function to draw text with shadow
+        fun drawTextWithShadow(text: String, x: Float, y: Float, scale: Float = 2f) {
+            game.font.data.setScale(scale)
+            // Shadow
+            game.font.color = Constants.UI_SHADOW_COLOR
+            game.font.draw(game.batch, text, x + 2, y - 2)
+            // Text
+            game.font.color = Constants.UI_TEXT_COLOR
+            game.font.draw(game.batch, text, x, y)
         }
 
-        // Debug info
-        val debugText = "PowerUps: ${powerUps.size} | Obstacles: ${obstacles.size}"
-        game.font.draw(
-            game.batch,
-            debugText,
-            10f,
-            JumperGame.GAME_HEIGHT - 110f
-        )
+        // Score (larger)
+        drawTextWithShadow("SCORE: ${GameStateManager.getCurrentScore()}", 10f, JumperGame.GAME_HEIGHT - 20f, 2.5f)
+
+        // Current weapon
+        drawTextWithShadow("WEAPON: ${player.getCurrentWeapon().name}", 10f, JumperGame.GAME_HEIGHT - 55f, 1.8f)
+
+        // Power jump indicator (glowing effect)
+        if (player.hasPowerJump()) {
+            game.font.data.setScale(2f)
+            game.font.color = com.badlogic.gdx.graphics.Color.CYAN
+            game.font.draw(game.batch, "POWER JUMP ACTIVE!", 10f, JumperGame.GAME_HEIGHT - 90f)
+        }
+
+        // Debug info (smaller)
+        drawTextWithShadow("PowerUps: ${powerUps.size} | Obstacles: ${obstacles.size}", 10f, JumperGame.GAME_HEIGHT - 120f, 1.3f)
 
         // Game over message
         if (gameOver) {
+            // Semi-transparent overlay
+            game.shapeRenderer.projectionMatrix = camera.combined
+            game.batch.end()
+            game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+            game.shapeRenderer.setColor(0f, 0f, 0f, 0.7f)
+            game.shapeRenderer.rect(0f, 0f, JumperGame.GAME_WIDTH, JumperGame.GAME_HEIGHT)
+            game.shapeRenderer.end()
+            game.batch.begin()
+
+            // Game Over text with shadow
+            game.font.data.setScale(4f)
             val gameOverText = "GAME OVER"
+            // Red shadow
+            game.font.color = com.badlogic.gdx.graphics.Color.RED
+            game.font.draw(
+                game.batch,
+                gameOverText,
+                5f,
+                JumperGame.GAME_HEIGHT / 2f + 55f,
+                JumperGame.GAME_WIDTH,
+                Align.center,
+                false
+            )
+            // White text
+            game.font.color = com.badlogic.gdx.graphics.Color.WHITE
             game.font.draw(
                 game.batch,
                 gameOverText,
@@ -143,6 +178,10 @@ class GameScreen(private val game: JumperGame) : Screen {
                 false
             )
 
+            // Tap to continue (smaller, pulsing)
+            game.font.data.setScale(2f)
+            val alpha = 0.5f + kotlin.math.sin(System.currentTimeMillis() * 0.003f) * 0.5f
+            game.font.color = com.badlogic.gdx.graphics.Color(1f, 1f, 1f, alpha)
             val tapText = "TAP TO CONTINUE"
             game.font.draw(
                 game.batch,
@@ -198,6 +237,13 @@ class GameScreen(private val game: JumperGame) : Screen {
                         if (shootCooldown <= 0f) {
                             bullets.addAll(player.shoot())
                             shootCooldown = Constants.SHOOT_COOLDOWN
+
+                            // Add shoot particle effect
+                            particleSystem.addShootEffect(
+                                player.getX() + Constants.PLAYER_WIDTH,
+                                player.getY() + Constants.PLAYER_HEIGHT / 2,
+                                Constants.BULLET_COLOR
+                            )
                         }
                     }
                 }
@@ -208,6 +254,9 @@ class GameScreen(private val game: JumperGame) : Screen {
     private fun update(delta: Float) {
         // Update player
         player.update(delta)
+
+        // Update particles
+        particleSystem.update(delta)
 
         // Check if player fell to the ground (game over)
         if (player.isOnGround()) {
@@ -276,6 +325,12 @@ class GameScreen(private val game: JumperGame) : Screen {
                 if (bullet.collidesWith(obstacle)) {
                     bulletCheckIterator.remove()
                     obstacleHit = true
+
+                    // Add explosion particle effect
+                    val obstacleBounds = obstacle.getBounds()
+                    val explosionX = obstacleBounds.x + obstacleBounds.width / 2
+                    val explosionY = obstacleBounds.y + obstacleBounds.height / 2
+                    particleSystem.addExplosion(explosionX, explosionY, Constants.OBSTACLE_COLOR_1, 30)
                     break
                 }
             }
