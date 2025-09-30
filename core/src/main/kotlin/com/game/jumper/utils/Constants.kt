@@ -85,6 +85,28 @@ object Constants {
     // Score
     const val SCORE_PER_OBSTACLE = 1
 
+    // Life system
+    const val MAX_LIVES = 3
+    const val LIFE_DROP_CHANCE = 0.3f // 30% chance to drop life
+    const val LIFE_PICKUP_SIZE = 25f
+    const val LIFE_PICKUP_FALL_SPEED = 60f
+    val LIFE_COLOR = Color(1f, 0.2f, 0.4f, 1f) // Pink/Red heart color
+    val LIFE_OUTLINE = Color(0.8f, 0f, 0.2f, 1f)
+
+    // Enemies
+    const val ENEMY_WIDTH = 45f
+    const val ENEMY_HEIGHT = 45f
+    const val ENEMY_SPEED = 150f
+    const val ENEMY_SPAWN_INTERVAL = 3f // Spawn every 3 seconds
+    const val ENEMY_SHOOT_INTERVAL = 2f // Shoot every 2 seconds
+    val ENEMY_COLOR = Color(0.6f, 0.2f, 0.8f, 1f) // Purple
+    val ENEMY_OUTLINE = Color(0.3f, 0.1f, 0.4f, 1f)
+
+    const val ENEMY_BULLET_WIDTH = 10f
+    const val ENEMY_BULLET_HEIGHT = 10f
+    const val ENEMY_BULLET_SPEED = 250f
+    val ENEMY_BULLET_COLOR = Color(0.9f, 0.3f, 0.9f, 1f) // Bright purple
+
     // Ads
     const val SHOW_INTERSTITIAL_EVERY = 3 // Show interstitial every N game overs
 }

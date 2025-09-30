@@ -70,6 +70,13 @@ class Bullet(
     }
 
     /**
+     * Check collision with a rectangle (for enemies)
+     */
+    fun collidesWith(rect: Rectangle): Boolean {
+        return bounds.overlaps(rect)
+    }
+
+    /**
      * Render the bullet with glow effect
      */
     fun render(shapeRenderer: ShapeRenderer) {

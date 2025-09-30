@@ -17,6 +17,7 @@ class Player(x: Float, y: Float) {
     private var currentWeapon = WeaponType.NORMAL
     private var hasPowerJump = false
     private var skin = PlayerSkin.DEFAULT
+    private var lives = Constants.MAX_LIVES
 
     fun update(delta: Float) {
         // Apply gravity
@@ -153,6 +154,27 @@ class Player(x: Float, y: Float) {
 
     fun hasPowerJump(): Boolean = hasPowerJump
 
+    /**
+     * Take damage and return true if still alive
+     */
+    fun takeDamage(): Boolean {
+        lives--
+        return lives > 0
+    }
+
+    /**
+     * Heal player (from life pickup)
+     */
+    fun heal() {
+        if (lives < Constants.MAX_LIVES) {
+            lives++
+        }
+    }
+
+    fun getLives(): Int = lives
+
+    fun isDead(): Boolean = lives <= 0
+
     fun reset() {
         bounds.x = Constants.PLAYER_START_X
         bounds.y = Constants.PLAYER_START_Y
@@ -161,5 +183,6 @@ class Player(x: Float, y: Float) {
         jumpCount = 0
         currentWeapon = WeaponType.NORMAL
         hasPowerJump = false
+        lives = Constants.MAX_LIVES
     }
 }

@@ -68,33 +68,35 @@ class InstructionsScreen(private val game: JumperGame) : Screen {
         var yPos = JumperGame.GAME_HEIGHT - 120f
 
         drawText("OBJECTIVE:", yPos, 2.2f)
-        yPos -= 40f
-        drawText("Stay in the air! Don't hit the ground!", yPos, 1.8f)
-        yPos -= 60f
+        yPos -= 35f
+        drawText("Stay alive! You have 3 lives.", yPos, 1.7f)
+        yPos -= 30f
+        drawText("Avoid ground & enemies!", yPos, 1.7f)
+        yPos -= 55f
 
         drawText("CONTROLS:", yPos, 2.2f)
-        yPos -= 40f
-        drawText("• TAP LEFT SIDE: Jump (3x in air)", yPos, 1.8f)
         yPos -= 35f
-        drawText("• TAP RIGHT SIDE: Shoot", yPos, 1.8f)
-        yPos -= 35f
-        drawText("• CLICK POWERUPS: Collect", yPos, 1.8f)
-        yPos -= 60f
+        drawText("• LEFT: Jump (3x in air)", yPos, 1.7f)
+        yPos -= 30f
+        drawText("• RIGHT: Shoot enemies", yPos, 1.7f)
+        yPos -= 30f
+        drawText("• CLICK ITEMS: Collect", yPos, 1.7f)
+        yPos -= 55f
 
-        drawText("WEAPONS:", yPos, 2.2f)
-        yPos -= 40f
-        drawText("• RAPID FIRE: Fast orange bullets", yPos, 1.6f)
-        yPos -= 30f
-        drawText("• LASER: Long cyan beam", yPos, 1.6f)
-        yPos -= 30f
-        drawText("• SPREAD: 3-way magenta shots", yPos, 1.6f)
+        drawText("ENEMIES:", yPos, 2.2f)
+        yPos -= 35f
+        drawText("• Purple diamonds shoot!", yPos, 1.6f)
+        yPos -= 28f
+        drawText("• Takes 2 hits to destroy", yPos, 1.6f)
         yPos -= 50f
 
-        drawText("POWERUPS:", yPos, 2.2f)
-        yPos -= 40f
+        drawText("ITEMS:", yPos, 2.2f)
+        yPos -= 35f
         drawText("• GOLD: Weapon upgrades", yPos, 1.6f)
-        yPos -= 30f
-        drawText("• SKY BLUE: Power jump boost", yPos, 1.6f)
+        yPos -= 28f
+        drawText("• SKY BLUE: Power jump", yPos, 1.6f)
+        yPos -= 28f
+        drawText("• PINK HEART: Restore life", yPos, 1.6f)
 
         // Back button
         game.font.data.setScale(2f)

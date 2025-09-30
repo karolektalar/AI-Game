@@ -28,9 +28,13 @@ class GameScreen(private val game: JumperGame) : Screen {
     private val obstacles = mutableListOf<Obstacle>()
     private val bullets = mutableListOf<Bullet>()
     private val powerUps = mutableListOf<PowerUp>()
+    private val enemies = mutableListOf<Enemy>()
+    private val enemyBullets = mutableListOf<EnemyBullet>()
+    private val lifePickups = mutableListOf<LifePickup>()
     private val particleSystem = ParticleSystem()
 
     private var spawnTimer = 0f
+    private var enemySpawnTimer = 0f
     private var shootCooldown = 0f
     private var gameOver = false
 
@@ -40,6 +44,9 @@ class GameScreen(private val game: JumperGame) : Screen {
         obstacles.clear()
         bullets.clear()
         powerUps.clear()
+        enemies.clear()
+        enemyBullets.clear()
+        lifePickups.clear()
         particleSystem.clear()
         player.reset()
 
@@ -47,6 +54,7 @@ class GameScreen(private val game: JumperGame) : Screen {
         player.setSkin(com.game.jumper.managers.SkinManager.getCurrentSkin())
 
         spawnTimer = 0f
+        enemySpawnTimer = 0f
         shootCooldown = 0f
         gameOver = false
     }
@@ -98,15 +106,33 @@ class GameScreen(private val game: JumperGame) : Screen {
             powerUp.render(game.shapeRenderer)
         }
 
+        for (enemy in enemies) {
+            enemy.render(game.shapeRenderer)
+        }
+
+        for (enemyBullet in enemyBullets) {
+            enemyBullet.render(game.shapeRenderer)
+        }
+
+        for (lifePickup in lifePickups) {
+            lifePickup.render(game.shapeRenderer)
+        }
+
         // Render particles
         particleSystem.render(game.shapeRenderer)
 
         game.shapeRenderer.end()
 
-        // Render power-up borders
+        // Render power-up borders and enemy outlines
         game.shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
         for (powerUp in powerUps) {
             powerUp.renderBorder(game.shapeRenderer)
+        }
+        for (enemy in enemies) {
+            enemy.renderOutline(game.shapeRenderer)
+        }
+        for (lifePickup in lifePickups) {
+            lifePickup.renderOutline(game.shapeRenderer)
         }
         game.shapeRenderer.end()
 
@@ -125,21 +151,24 @@ class GameScreen(private val game: JumperGame) : Screen {
             game.font.draw(game.batch, text, x, y)
         }
 
-        // Score (larger)
-        drawTextWithShadow("SCORE: ${GameStateManager.getCurrentScore()}", 10f, JumperGame.GAME_HEIGHT - 20f, 2.5f)
+        // Lives (top-left)
+        drawTextWithShadow("LIVES: ${player.getLives()}", 10f, JumperGame.GAME_HEIGHT - 20f, 2.5f)
+
+        // Score
+        drawTextWithShadow("SCORE: ${GameStateManager.getCurrentScore()}", 10f, JumperGame.GAME_HEIGHT - 55f, 2.5f)
 
         // Current weapon
-        drawTextWithShadow("WEAPON: ${player.getCurrentWeapon().name}", 10f, JumperGame.GAME_HEIGHT - 55f, 1.8f)
+        drawTextWithShadow("WEAPON: ${player.getCurrentWeapon().name}", 10f, JumperGame.GAME_HEIGHT - 90f, 1.8f)
 
         // Power jump indicator (glowing effect)
         if (player.hasPowerJump()) {
             game.font.data.setScale(2f)
             game.font.color = com.badlogic.gdx.graphics.Color.CYAN
-            game.font.draw(game.batch, "POWER JUMP ACTIVE!", 10f, JumperGame.GAME_HEIGHT - 90f)
+            game.font.draw(game.batch, "POWER JUMP ACTIVE!", 10f, JumperGame.GAME_HEIGHT - 125f)
         }
 
         // Debug info (smaller)
-        drawTextWithShadow("PowerUps: ${powerUps.size} | Obstacles: ${obstacles.size}", 10f, JumperGame.GAME_HEIGHT - 120f, 1.3f)
+        drawTextWithShadow("Enemies: ${enemies.size} | Obstacles: ${obstacles.size}", 10f, JumperGame.GAME_HEIGHT - 155f, 1.3f)
 
         // Game over message
         if (gameOver) {
@@ -275,6 +304,13 @@ class GameScreen(private val game: JumperGame) : Screen {
             spawnTimer = 0f
         }
 
+        // Spawn enemies
+        enemySpawnTimer += delta
+        if (enemySpawnTimer >= Constants.ENEMY_SPAWN_INTERVAL) {
+            spawnEnemy()
+            enemySpawnTimer = 0f
+        }
+
         // Update bullets
         val bulletIterator = bullets.iterator()
         while (bulletIterator.hasNext()) {
@@ -312,9 +348,21 @@ class GameScreen(private val game: JumperGame) : Screen {
             val obstacle = obstacleIterator.next()
             obstacle.update(delta)
 
-            // Check collision with player
+            // Check collision with player - takes damage
             if (player.collidesWith(obstacle)) {
-                gameOver = true
+                val alive = player.takeDamage()
+                if (!alive) {
+                    gameOver = true
+                }
+                // Add damage particle effect
+                particleSystem.addExplosion(
+                    player.getX() + Constants.PLAYER_WIDTH / 2,
+                    player.getY() + Constants.PLAYER_HEIGHT / 2,
+                    Constants.OBSTACLE_COLOR_1,
+                    15
+                )
+                obstacleIterator.remove()
+                continue
             }
 
             // Check collision with bullets
@@ -335,16 +383,25 @@ class GameScreen(private val game: JumperGame) : Screen {
                 }
             }
 
-            // Remove obstacle if hit by bullet and possibly drop power-up
+            // Remove obstacle if hit by bullet and possibly drop power-up or life
             if (obstacleHit) {
+                val obstacleBounds = obstacle.getBounds()
+                val centerX = obstacleBounds.x + obstacleBounds.width / 2
+                val centerY = obstacleBounds.y + obstacleBounds.height / 2
+
                 // Random chance to drop power-up
                 if (Random.nextFloat() < Constants.POWERUP_DROP_CHANCE) {
-                    val obstacleBounds = obstacle.getBounds()
-                    // Spawn at center of obstacle
-                    val powerUpX = obstacleBounds.x + obstacleBounds.width / 2 - Constants.POWERUP_SIZE / 2
-                    val powerUpY = obstacleBounds.y + obstacleBounds.height / 2 - Constants.POWERUP_SIZE / 2
+                    val powerUpX = centerX - Constants.POWERUP_SIZE / 2
+                    val powerUpY = centerY - Constants.POWERUP_SIZE / 2
                     spawnPowerUp(powerUpX, powerUpY)
                 }
+                // Random chance to drop life
+                else if (Random.nextFloat() < Constants.LIFE_DROP_CHANCE) {
+                    val lifeX = centerX - Constants.LIFE_PICKUP_SIZE / 2
+                    val lifeY = centerY - Constants.LIFE_PICKUP_SIZE / 2
+                    lifePickups.add(LifePickup(lifeX, lifeY))
+                }
+
                 obstacleIterator.remove()
                 continue
             }
@@ -358,6 +415,114 @@ class GameScreen(private val game: JumperGame) : Screen {
             // Remove off-screen obstacles
             if (obstacle.isOffScreen()) {
                 obstacleIterator.remove()
+            }
+        }
+
+        // Update life pickups
+        val lifeIterator = lifePickups.iterator()
+        while (lifeIterator.hasNext()) {
+            val lifePickup = lifeIterator.next()
+            lifePickup.update(delta)
+
+            // Check collision with player
+            if (lifePickup.collidesWith(player)) {
+                player.heal()
+                lifeIterator.remove()
+                continue
+            }
+
+            // Remove off-screen life pickups
+            if (lifePickup.isOffScreen()) {
+                lifeIterator.remove()
+            }
+        }
+
+        // Update enemies
+        val enemyIterator = enemies.iterator()
+        while (enemyIterator.hasNext()) {
+            val enemy = enemyIterator.next()
+            enemy.update(delta)
+
+            // Enemy shoots
+            val enemyBullet = enemy.shoot()
+            if (enemyBullet != null) {
+                enemyBullets.add(enemyBullet)
+            }
+
+            // Check collision with player bullets
+            var enemyHit = false
+            val bulletCheckIterator = bullets.iterator()
+            while (bulletCheckIterator.hasNext()) {
+                val bullet = bulletCheckIterator.next()
+                if (bullet.collidesWith(enemy.getBounds())) {
+                    bulletCheckIterator.remove()
+                    enemy.takeDamage()
+                    enemyHit = true
+
+                    // Add explosion particle effect
+                    val enemyBounds = enemy.getBounds()
+                    val explosionX = enemyBounds.x + enemyBounds.width / 2
+                    val explosionY = enemyBounds.y + enemyBounds.height / 2
+                    particleSystem.addExplosion(explosionX, explosionY, Constants.ENEMY_COLOR, 20)
+                    break
+                }
+            }
+
+            // Remove enemy if dead and possibly drop life
+            if (enemy.isDead()) {
+                val enemyBounds = enemy.getBounds()
+                val centerX = enemyBounds.x + enemyBounds.width / 2
+                val centerY = enemyBounds.y + enemyBounds.height / 2
+
+                // Drop life
+                if (Random.nextFloat() < Constants.LIFE_DROP_CHANCE) {
+                    val lifeX = centerX - Constants.LIFE_PICKUP_SIZE / 2
+                    val lifeY = centerY - Constants.LIFE_PICKUP_SIZE / 2
+                    lifePickups.add(LifePickup(lifeX, lifeY))
+                }
+
+                enemyIterator.remove()
+                continue
+            }
+
+            // Check scoring
+            if (!enemy.hasBeenScored() && enemy.isPassedBy(player.getX())) {
+                enemy.markAsScored()
+                GameStateManager.incrementScore()
+            }
+
+            // Remove off-screen enemies
+            if (enemy.isOffScreen()) {
+                enemyIterator.remove()
+            }
+        }
+
+        // Update enemy bullets
+        val enemyBulletIterator = enemyBullets.iterator()
+        while (enemyBulletIterator.hasNext()) {
+            val enemyBullet = enemyBulletIterator.next()
+            enemyBullet.update(delta)
+
+            // Check collision with player - takes damage
+            if (enemyBullet.collidesWith(player)) {
+                val alive = player.takeDamage()
+                if (!alive) {
+                    gameOver = true
+                }
+                // Add damage particle effect
+                particleSystem.addExplosion(
+                    player.getX() + Constants.PLAYER_WIDTH / 2,
+                    player.getY() + Constants.PLAYER_HEIGHT / 2,
+                    Constants.ENEMY_BULLET_COLOR,
+                    15
+                )
+                enemyBulletIterator.remove()
+                continue
+            }
+
+            // Remove off-screen bullets
+            if (enemyBullet.isOffScreen()) {
+                enemyBulletIterator.remove()
             }
         }
     }
@@ -394,6 +559,16 @@ class GameScreen(private val game: JumperGame) : Screen {
 
         val obstacle = Obstacle(JumperGame.GAME_WIDTH, randomY, width, height, randomShape)
         obstacles.add(obstacle)
+    }
+
+    private fun spawnEnemy() {
+        // Random height within valid range
+        val minY = Constants.GROUND_HEIGHT
+        val maxY = JumperGame.GAME_HEIGHT - Constants.ENEMY_HEIGHT - 100f
+        val randomY = Random.nextFloat() * (maxY - minY) + minY
+
+        val enemy = Enemy(JumperGame.GAME_WIDTH, randomY)
+        enemies.add(enemy)
     }
 
     override fun resize(width: Int, height: Int) {}
