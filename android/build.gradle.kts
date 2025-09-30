@@ -9,19 +9,29 @@ configurations {
 
 android {
     namespace = "com.game.jumper"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.game.jumper"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+    }
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("jumper-release-key.jks")
+            storePassword = "android123"
+            keyAlias = "jumper-key"
+            keyPassword = "android123"
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
