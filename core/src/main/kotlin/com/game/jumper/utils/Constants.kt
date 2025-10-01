@@ -90,6 +90,7 @@ object Constants {
     const val LIFE_DROP_CHANCE = 0.3f // 30% chance to drop life
     const val LIFE_PICKUP_SIZE = 25f
     const val LIFE_PICKUP_FALL_SPEED = 60f
+    const val CEILING_DAMAGE_COOLDOWN = 1f // seconds before taking ceiling damage again
     val LIFE_COLOR = Color(1f, 0.2f, 0.4f, 1f) // Pink/Red heart color
     val LIFE_OUTLINE = Color(0.8f, 0f, 0.2f, 1f)
 

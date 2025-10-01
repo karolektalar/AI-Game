@@ -363,7 +363,7 @@ class GameScreen(private val game: JumperGame) : Screen {
                 com.badlogic.gdx.graphics.Color.YELLOW,
                 15
             )
-            ceilingDamageCooldown = 1f // 1 second cooldown before taking damage again
+            ceilingDamageCooldown = Constants.CEILING_DAMAGE_COOLDOWN
         }
 
         // Update shoot cooldown
@@ -654,5 +654,9 @@ class GameScreen(private val game: JumperGame) : Screen {
 
     override fun hide() {}
 
-    override fun dispose() {}
+    override fun dispose() {
+        // Note: We don't dispose game.batch, game.shapeRenderer, or game.font
+        // as they are owned and managed by JumperGame and shared across all screens.
+        // They will be disposed when JumperGame.dispose() is called.
+    }
 }
