@@ -1,0 +1,204 @@
+# Polityka Prywatności - Bajki na Dobranoc
+
+**Data ostatniej aktualizacji: 24 października 2025**
+
+## 1. Wprowadzenie
+
+Niniejsza Polityka Prywatności opisuje, jak aplikacja "Bajki na Dobranoc" (zwana dalej "Aplikacją") zbiera, wykorzystuje i chroni dane użytkowników.
+
+Szanujemy Twoją prywatność i zobowiązujemy się do ochrony Twoich danych osobowych. Aplikacja została zaprojektowana z myślą o maksymalnej prywatności użytkowników.
+
+## 2. Administrator Danych
+
+Aplikacja "Bajki na Dobranoc" nie zbiera żadnych danych na serwery dewelopera. Wszystkie dane są przechowywane wyłącznie lokalnie na urządzeniu użytkownika.
+
+## 3. Jakie Dane Zbieramy
+
+### 3.1 Dane Przechowywane Lokalnie
+
+Aplikacja przechowuje następujące dane wyłącznie na Twoim urządzeniu:
+
+- **Klucze API**: Klucze dostępu do usług OpenAI, Anthropic Claude lub Google Gemini, które samodzielnie wprowadzasz w ustawieniach
+- **Wygenerowane bajki**: Treść bajek wygenerowanych przez AI wraz z metadanymi (tytuł, temat, imię bohatera, grupa wiekowa)
+- **Preferencje użytkownika**: Wybrane ustawienia aplikacji (preferowany dostawca AI, język interfejsu, status ukończenia onboardingu)
+- **Serie bajek**: Informacje o utworzonych seriach wieloodcinkowych bajek
+
+### 3.2 Dane NIE Zbierane
+
+Aplikacja NIE zbiera następujących danych:
+
+- Danych osobowych (imię, nazwisko, adres e-mail)
+- Danych lokalizacyjnych
+- Danych telemetrycznych lub analitycznych
+- Informacji o urządzeniu
+- Plików cookies
+- Żadnych innych danych identyfikujących użytkownika
+
+## 4. Jak Wykorzystujemy Dane
+
+### 4.1 Wykorzystanie Lokalne
+
+Wszystkie dane przechowywane lokalnie służą wyłącznie do:
+
+- Umożliwienia działania aplikacji
+- Zapisywania wygenerowanych bajek
+- Zapamiętywania preferencji użytkownika
+- Komunikacji z wybranymi usługami AI (OpenAI, Anthropic, Google Gemini)
+
+### 4.2 Komunikacja z Usługami Zewnętrznymi
+
+Aplikacja komunikuje się z następującymi usługami AI, w zależności od Twojego wyboru:
+
+#### OpenAI
+- **Cel**: Generowanie treści bajek
+- **Przesyłane dane**: Parametry bajki (temat, imię bohatera, grupa wiekowa, długość, ustawienia narracji)
+- **Polityka prywatności**: [https://openai.com/policies/privacy-policy](https://openai.com/policies/privacy-policy)
+- **Model używany**: GPT-3.5-turbo
+
+#### Anthropic Claude
+- **Cel**: Generowanie treści bajek
+- **Przesyłane dane**: Parametry bajki (temat, imię bohatera, grupa wiekowa, długość, ustawienia narracji)
+- **Polityka prywatności**: [https://www.anthropic.com/privacy](https://www.anthropic.com/privacy)
+- **Model używany**: Claude 3 Haiku
+
+#### Google Gemini
+- **Cel**: Generowanie treści bajek
+- **Przesyłane dane**: Parametry bajki (temat, imię bohatera, grupa wiekowa, długość, ustawienia narracji)
+- **Polityka prywatności**: [https://policies.google.com/privacy](https://policies.google.com/privacy)
+- **Model używany**: Gemini 2.0 Flash
+
+**WAŻNE**: Dane przesyłane do usług AI są przetwarzane zgodnie z politykami prywatności tych usług. Nie mamy kontroli nad tym, jak te usługi przetwarzają Twoje dane. Zalecamy zapoznanie się z ich politykami prywatności.
+
+## 5. Przechowywanie i Bezpieczeństwo Danych
+
+### 5.1 Lokalne Przechowywanie
+
+- Wszystkie dane są przechowywane wyłącznie na Twoim urządzeniu
+- Dane są zapisywane w lokalnej bazie danych (Room Database) oraz w zaszyfrowanym magazynie preferencji (DataStore)
+- Klucze API są przechowywane w bezpiecznym magazynie preferencji urządzenia
+- Dane nie są synchronizowane z żadnym serwerem zewnętrznym
+
+### 5.2 Bezpieczeństwo
+
+- Aplikacja nie przesyła danych na serwery dewelopera
+- Komunikacja z usługami AI odbywa się przez szyfrowane połączenia HTTPS
+- Klucze API są przechowywane bezpiecznie i nie są logowane
+- Aplikacja używa ProGuard do optymalizacji i ochrony kodu w wersji release
+
+## 6. Prywatność Dzieci
+
+Aplikacja jest przeznaczona do generowania bajek dla dzieci, jednak sama aplikacja wymaga nadzoru osoby dorosłej do:
+
+- Wprowadzenia i zarządzania kluczami API
+- Konfiguracji ustawień aplikacji
+- Generowania i zarządzania bajkami
+
+**Zgodność z COPPA** (Children's Online Privacy Protection Act):
+- Aplikacja nie zbiera świadomie żadnych danych osobowych od dzieci poniżej 13. roku życia
+- Aplikacja nie wymaga rejestracji ani podawania danych osobowych
+- Wszystkie funkcje wymagające wprowadzenia kluczy API powinny być wykonywane przez osoby dorosłe
+
+## 7. Uprawnienia Aplikacji
+
+Aplikacja wymaga następujących uprawnień systemowych:
+
+- **INTERNET**: Komunikacja z usługami AI (OpenAI, Anthropic, Google Gemini) w celu generowania bajek
+- **Brak innych uprawnień**: Aplikacja nie wymaga dostępu do kontaktów, lokalizacji, aparatu, mikrofonu ani innych wrażliwych funkcji urządzenia
+
+## 8. Udostępnianie Bajek
+
+Aplikacja oferuje funkcję udostępniania wygenerowanych bajek za pomocą standardowego mechanizmu udostępniania Android:
+
+- Udostępnianie odbywa się poprzez natywny system Android
+- Użytkownik ma pełną kontrolę nad tym, komu i w jaki sposób udostępnia bajki
+- Aplikacja nie przesyła ani nie przechowuje informacji o udostępnianych bajkach
+
+## 9. Twoje Prawa
+
+Jako użytkownik aplikacji masz następujące prawa:
+
+### 9.1 Prawo do Usunięcia Danych
+
+- Możesz w dowolnym momencie usunąć wszystkie zapisane bajki z poziomu aplikacji
+- Możesz usunąć klucze API z ustawień aplikacji
+- Możesz całkowicie usunąć aplikację wraz ze wszystkimi danymi poprzez standardową procedurę odinstalowania
+
+### 9.2 Prawo do Eksportu Danych
+
+- Możesz eksportować zapisane bajki za pomocą funkcji udostępniania
+- Wszystkie Twoje dane są dostępne wyłącznie na Twoim urządzeniu
+
+### 9.3 Prawo do Ograniczenia Przetwarzania
+
+- W każdej chwili możesz przestać używać aplikacji bez żadnych konsekwencji
+- Możesz wyłączyć automatyczne zapisywanie bajek
+
+## 10. Zmiany w Polityce Prywatności
+
+Zastrzegamy sobie prawo do aktualizacji niniejszej Polityki Prywatności w celu odzwierciedlenia zmian w aplikacji lub wymogów prawnych.
+
+- Data ostatniej aktualizacji jest zawsze widoczna na początku tego dokumentu
+- Istotne zmiany będą komunikowane poprzez aktualizację aplikacji
+- Kontynuacja korzystania z aplikacji po wprowadzeniu zmian oznacza akceptację nowej Polityki Prywatności
+
+## 11. Zgodność z RODO
+
+Aplikacja jest zgodna z Ogólnym Rozporządzeniem o Ochronie Danych (RODO):
+
+- **Minimalizacja danych**: Zbieramy tylko niezbędne minimum danych
+- **Przechowywanie lokalne**: Wszystkie dane pozostają na Twoim urządzeniu
+- **Przejrzystość**: Jasno informujemy, jakie dane są przetwarzane i w jaki sposób
+- **Kontrola użytkownika**: Masz pełną kontrolę nad swoimi danymi
+
+## 12. Usługi Analityczne i Reklamowe
+
+Aplikacja NIE wykorzystuje:
+
+- Usług analitycznych (Google Analytics, Firebase Analytics, etc.)
+- Reklam
+- Systemów śledzenia użytkowników
+- Plików cookies
+- Żadnych innych narzędzi zbierających dane użytkowników
+
+## 13. Kontakt
+
+W przypadku pytań dotyczących niniejszej Polityki Prywatności lub praktyk związanych z prywatnością w aplikacji, możesz skontaktować się z nami poprzez:
+
+- Stronę aplikacji w Google Play Store
+- Formularz kontaktowy dostępny w opisie aplikacji
+
+## 14. Zgodność z Zasadami Google Play
+
+Aplikacja jest zgodna z wymogami Google Play dotyczącymi prywatności:
+
+- Zawiera Politykę Prywatności
+- Nie zbiera wrażliwych danych użytkowników
+- Nie udostępnia danych osobowych stronom trzecim (poza komunikacją z wybranymi usługami AI w zakresie niezbędnym do działania aplikacji)
+- Przejrzyście informuje użytkowników o przetwarzaniu danych
+
+## 15. Oświadczenie o Bezpieczeństwie Danych
+
+**Deklaracja zgodna z wymogami Google Play:**
+
+### Dane zbierane przez aplikację:
+- **Klucze API** (przechowywane lokalnie, zaszyfrowane)
+- **Treść bajek** (przechowywana lokalnie)
+- **Preferencje użytkownika** (przechowywane lokalnie)
+
+### Dane NIE zbierane:
+- Dane osobowe
+- Dane finansowe
+- Dane lokalizacyjne
+- Dane o aktywności w aplikacji (poza funkcjonalnością aplikacji)
+- Identyfikatory urządzeń
+
+### Bezpieczeństwo:
+- ✓ Dane są szyfrowane podczas przesyłania (HTTPS)
+- ✓ Użytkownicy mogą żądać usunięcia danych (odinstalowanie aplikacji)
+- ✓ Aplikacja jest zgodna z RODO i COPPA
+
+---
+
+**Ostatnia aktualizacja**: 24 października 2025
+
+Korzystając z aplikacji "Bajki na Dobranoc", akceptujesz warunki niniejszej Polityki Prywatności.
